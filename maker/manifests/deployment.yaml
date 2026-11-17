@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
         - name: maker
-          image: hafizmhd/maker:30
+          image: hafizmhd/maker:31
           imagePullPolicy: Always
           ports:
             - containerPort: 80
