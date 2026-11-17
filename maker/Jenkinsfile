@@ -61,9 +61,10 @@ pipeline {
                             git pull --rebase origin main
                             
                             # Perform sed update, commit, and push
-                            sed -i '/name: maker/{n;s|image:.*|image:${env.BUILD_NUMBER}|;}'maker/manifests/deployment.yaml
+                            sed -i '/name: maker/{n;s|image:.*|image: hafizmhd/maker:${env.BUILD_NUMBER}|;}' maker/manifests/deployment.yaml
                             git config user.name "hafiz-mhd"
                             git config user.email "hafizmuhammedar123@gmail.com"
+                            git add maker/manifests/deployment.yaml
                             git commit -am "chore(manifest): update maker image tag to ${env.BUILD_NUMBER} [skip ci]"
                             git push origin main
                         """
