@@ -51,29 +51,27 @@ pipeline {
 
        stage('Update Manifest Repo') {
             steps {
-                dir('manifest-workspace') {
-                    withCredentials([usernamePassword(credentialsId: 'github-cred', usernameVariable: 'GH_USER', passwordVariable: 'GH_TOKEN')]) {
-                        sh """
-                            # Configure remote URL with properly escaped variables for pushing
-                            git remote set-url origin https://\${GH_USER}:\${GH_TOKEN}@github.com/hafiz-mhd/jenkins_maker_folder.git
-                            
-                            # Fetch and rebase to get any latest changes from remote
-                            git pull --rebase origin main
-                            pwd
-                            git rev-parse --show-toplevel
-                            git ls-files maker/manifests/deployment.yaml
-                            # Perform sed update, commit, and push
-                            sed -i '/name: maker/{n;s|image:.*|image:hafizmhd/maker:${env.BUILD_NUMBER}|}' maker/manifests/deployment.yaml
-                            git config user.name "hafiz-mhd"
-                            git config user.email "hafizmuhammedar123@gmail.com"
-                            git commit -am "chore(manifest): update maker image tag to ${env.BUILD_NUMBER} [skip ci]"
-                            git push origin main
-                        """
-                    }
+                withCredentials([usernamePassword(credentialsId: 'github-cred', usernameVariable: 'GH_USER', passwordVariable: 'GH_TOKEN')]) {
+                    sh """
+                        # Configure remote URL with properly escaped variables for pushing
+                        git remote set-url origin https://\${GH_USER}:\${GH_TOKEN}@github.com/hafiz-mhd/jenkins_maker_folder.git
+
+                        # Ensure we are on main branch and up to date
+                        git checkout main
+                        git pull --rebase origin main
+
+                        # Perform sed update (note the space after 'image:')
+                        sed -i '/name: maker/{n;s|image:.*|image: hafizmhd/maker:${env.BUILD_NUMBER}|}' maker/manifests/deployment.yaml
+
+                        # Commit and push changes
+                        git config user.name "hafiz-mhd"
+                        git config user.email "hafizmuhammedar123@gmail.com"
+                        git commit -am "chore(manifest): update maker image tag to ${env.BUILD_NUMBER} [skip ci]"
+                        git push origin main
+                    """
                 }
             }
         }
-    }
     post {
         success {
             echo 'Pipeline executed successfully! Manifest repo updated with new image tag.'
