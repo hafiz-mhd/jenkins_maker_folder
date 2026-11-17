@@ -59,12 +59,9 @@ pipeline {
                             
                             # Fetch and rebase to get any latest changes from remote
                             git pull --rebase origin main
-
-                            pwd
-                            find . -name deployment.yaml
                             
                             # Perform sed update, commit, and push
-                            sed -i '/name: maker/{n;s|image:.*|image: hafizmhd/maker:${env.BUILD_NUMBER}|;}'  maker/manifests/deployment.yaml
+                            sed -i '/name: maker/{n;s|image:.*|image:hafizmhd/maker:${env.BUILD_NUMBER}|}'  maker/manifests/deployment.yaml
                             git config user.name "hafiz-mhd"
                             git config user.email "hafizmuhammedar123@gmail.com"
                             git add maker/manifests/deployment.yaml
